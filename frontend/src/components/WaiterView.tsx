@@ -1,7 +1,21 @@
+// components/WaiterView.tsx
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Clock, 
+  User, 
+  ChefHat, 
+  Coffee, 
+  CheckCircle,
+  AlertCircle,
+  Users,
+  ClipboardList,
+  RefreshCw,
+  Package,
+  Bell
+} from 'lucide-react';
 
-// 1. TypeScript Interfaces mapping to our backend
 interface OrderItem {
   item_id: string;
   name: string;
@@ -32,8 +46,8 @@ const WaiterView = () => {
   const [staff, setStaff] = useState<Staff[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
-  // 2. Fetch Orders and Staff on load
   const fetchData = async () => {
     try {
       const [ordersRes, staffRes] = await Promise.all([
@@ -43,114 +57,221 @@ const WaiterView = () => {
       setOrders(ordersRes.data);
       setStaff(staffRes.data);
     } catch (err) {
-      setError("Failed to load dashboard data.");
+      setError("Failed to load dashboard data. Please refresh.");
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
   };
 
   useEffect(() => {
     fetchData();
-    // Optional: Set up a polling interval to auto-refresh orders every 10 seconds
-    const interval = setInterval(fetchData, 10000);
+    const interval = setInterval(fetchData, 15000);
     return () => clearInterval(interval);
   }, []);
 
-  // 3. Handle Order Updates (Status or Staff Assignment)
   const handleUpdateOrder = async (orderId: string, updates: Partial<Order>) => {
     try {
       await axios.put(`${import.meta.env.VITE_API_BASE_URL}/orders/${orderId}`, updates);
-      fetchData(); // Refresh the data to show the changes
+      fetchData();
     } catch (err) {
-      alert("Failed to update order.");
+      alert("Failed to update order. Please try again.");
     }
   };
 
-  if (loading) return <div>Loading dashboard...</div>;
-  if (error) return <div style={{ color: 'red' }}>{error}</div>;
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    fetchData();
+  };
+
+  const getStatusColor = (status: string) => {
+    switch(status) {
+      case 'PENDING': return 'status-pending';
+      case 'ASSIGNED': return 'status-assigned';
+      case 'SERVED': return 'status-served';
+      case 'PAID': return 'status-paid';
+      default: return '';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch(status) {
+      case 'PENDING': return <AlertCircle className="w-4 h-4" />;
+      case 'ASSIGNED': return <Users className="w-4 h-4" />;
+      case 'SERVED': return <CheckCircle className="w-4 h-4" />;
+      case 'PAID': return <Package className="w-4 h-4" />;
+      default: return null;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="loading-state">
+        <div className="loading-spinner" />
+        <p>Loading orders...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-state">
+        <AlertCircle className="w-12 h-12 text-terracotta" />
+        <p>{error}</p>
+        <button onClick={handleRefresh} className="retry-btn">
+          <RefreshCw className="w-4 h-4" />
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  const pendingOrders = orders.filter(o => o.status === 'PENDING').length;
+  const assignedOrders = orders.filter(o => o.status === 'ASSIGNED').length;
 
   return (
-    <div>
-      <h2>Waiter Dashboard 📋</h2>
-      <p>Manage incoming orders and assign staff.</p>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '20px' }}>
-        {orders.length === 0 ? <p>No active orders.</p> : orders.map((order) => (
-          <div key={order.id} style={{ 
-            border: '1px solid #ccc', 
-            borderRadius: '8px', 
-            padding: '20px',
-            backgroundColor: order.status === 'PENDING' ? '#fff3cd' : '#fff' // Highlight pending orders
-          }}>
-            
-            {/* Header: Order ID & Status */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '10px' }}>
-              <strong>Order: {order.id.split('-')[0]}...</strong>
-              <div>
-                <span style={{ marginRight: '10px' }}>⏱ {order.estimated_wait_time} mins</span>
-                <select 
-                  value={order.status} 
-                  onChange={(e) => handleUpdateOrder(order.id, { status: e.target.value as Order['status'] })}
-                  style={{ padding: '5px', fontWeight: 'bold' }}
-                >
-                  <option value="PENDING">PENDING</option>
-                  <option value="ASSIGNED">ASSIGNED</option>
-                  <option value="SERVED">SERVED</option>
-                  <option value="PAID">PAID</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Body: Items & Assignments */}
-            <div style={{ display: 'flex', gap: '20px' }}>
-              
-              {/* Order Items List */}
-              <div style={{ flex: 1 }}>
-                <h4>Items Ordered:</h4>
-                <ul style={{ paddingLeft: '20px', margin: 0 }}>
-                  {order.items.map((item, idx) => (
-                    <li key={idx}>
-                      {item.quantity}x {item.name} <small>({item.type})</small>
-                    </li>
-                  ))}
-                </ul>
-                <h4 style={{ marginTop: '10px' }}>Total: ₦{Number(order.total_amount).toLocaleString('en-NG')}</h4>
-              </div>
-
-              {/* Staff Assignment Dropdowns */}
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <h4>Assignments:</h4>
-                
-                <label style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  Waiter:
-                  <select 
-                    value={order.waiter_id || ''} 
-                    onChange={(e) => handleUpdateOrder(order.id, { waiter_id: e.target.value })}
-                  >
-                    <option value="">-- Unassigned --</option>
-                    {staff.filter(s => s.role === 'WAITER').map(s => (
-                      <option key={s.id} value={s.id}>{s.name}</option>
-                    ))}
-                  </select>
-                </label>
-
-                <label style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  Chef:
-                  <select 
-                    value={order.chef_id || ''} 
-                    onChange={(e) => handleUpdateOrder(order.id, { chef_id: e.target.value })}
-                  >
-                    <option value="">-- Unassigned --</option>
-                    {staff.filter(s => s.role === 'CHEF').map(s => (
-                      <option key={s.id} value={s.id}>{s.name}</option>
-                    ))}
-                  </select>
-                </label>
-
-              </div>
-            </div>
+    <div className="waiter-view">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Service Dashboard</h1>
+          <p className="page-subtitle">Manage orders and coordinate with your team</p>
+        </div>
+        <div className="header-actions">
+          <div className="order-stats">
+            <span className="stat-badge pending">
+              <Bell className="w-3 h-3" />
+              {pendingOrders} Pending
+            </span>
+            <span className="stat-badge assigned">
+              <Users className="w-3 h-3" />
+              {assignedOrders} Assigned
+            </span>
           </div>
-        ))}
+          <button onClick={handleRefresh} className="refresh-btn" disabled={isRefreshing}>
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'spin' : ''}`} />
+          </button>
+        </div>
+      </div>
+
+      <div className="orders-list">
+        <AnimatePresence>
+          {orders.length === 0 ? (
+            <div className="empty-state">
+              <ClipboardList className="w-16 h-16 text-olive" />
+              <p>No active orders</p>
+              <span>Orders will appear here as customers place them</span>
+            </div>
+          ) : (
+            orders.map((order, index) => (
+              <motion.div
+                key={order.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className={`order-card ${getStatusColor(order.status)}`}
+              >
+                <div className="order-header">
+                  <div className="order-id">
+                    <span className="order-id-label">Order</span>
+                    <span className="order-id-value">#{order.id.split('-')[0]}</span>
+                  </div>
+                  <div className="order-status">
+                    <span className={`status-badge ${getStatusColor(order.status)}`}>
+                      {getStatusIcon(order.status)}
+                      {order.status}
+                    </span>
+                    <span className="order-time">
+                      <Clock className="w-3 h-3" />
+                      {order.estimated_wait_time} min
+                    </span>
+                  </div>
+                </div>
+
+                <div className="order-body">
+                  <div className="order-items">
+                    <h4>Items</h4>
+                    <ul>
+                      {order.items.map((item, idx) => (
+                        <li key={idx}>
+                          <span className="item-qty">{item.quantity}x</span>
+                          <span className="item-name">{item.name}</span>
+                          <span className={`item-type ${item.type.toLowerCase()}`}>
+                            {item.type}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="order-assignments">
+                    <h4>Assign Staff</h4>
+                    <div className="assignment-grid">
+                      <div className="assignment-field">
+                        <label>
+                          <User className="w-3 h-3" />
+                          Waiter
+                        </label>
+                        <select 
+                          value={order.waiter_id || ''} 
+                          onChange={(e) => handleUpdateOrder(order.id, { waiter_id: e.target.value })}
+                        >
+                          <option value="">-- Unassigned --</option>
+                          {staff.filter(s => s.role === 'WAITER').map(s => (
+                            <option key={s.id} value={s.id}>{s.name}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="assignment-field">
+                        <label>
+                          <ChefHat className="w-3 h-3" />
+                          Chef
+                        </label>
+                        <select 
+                          value={order.chef_id || ''} 
+                          onChange={(e) => handleUpdateOrder(order.id, { chef_id: e.target.value })}
+                        >
+                          <option value="">-- Unassigned --</option>
+                          {staff.filter(s => s.role === 'CHEF').map(s => (
+                            <option key={s.id} value={s.id}>{s.name}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="assignment-field">
+                        <label>
+                          <Coffee className="w-3 h-3" />
+                          Bartender
+                        </label>
+                        <select 
+                          value={order.bartender_id || ''} 
+                          onChange={(e) => handleUpdateOrder(order.id, { bartender_id: e.target.value })}
+                        >
+                          <option value="">-- Unassigned --</option>
+                          {staff.filter(s => s.role === 'BARTENDER').map(s => (
+                            <option key={s.id} value={s.id}>{s.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="order-footer">
+                  <span className="order-total">
+                    Total: ₦{Number(order.total_amount).toLocaleString('en-NG')}
+                  </span>
+                  <span className="order-created">
+                    {new Date(order.created_at).toLocaleTimeString('en-NG', {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                </div>
+              </motion.div>
+            ))
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
