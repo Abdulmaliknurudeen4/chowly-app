@@ -773,11 +773,14 @@ body {
   font-size: 0.875rem;
   resize: vertical;
   transition: border-color var(--transition);
+  background: var(--white);
+  color: #1a1a1a; /* Dark text for visibility */
 }
 
 .feedback-textarea:focus {
   outline: none;
   border-color: var(--dark-green);
+  box-shadow: 0 0 0 3px rgba(29, 76, 52, 0.1);
 }
 
 .feedback-submit-btn {
@@ -1319,17 +1322,30 @@ body {
 }
 
 .assignment-field select {
-  padding: 0.375rem 0.5rem;
-  border: 1px solid rgba(116, 138, 118, 0.15);
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(116, 138, 118, 0.2);
   border-radius: var(--radius-sm);
   font-size: 0.8125rem;
   background: var(--white);
-  transition: border-color var(--transition);
+  color: var(--dark-green);
+  font-weight: 500;
+  transition: all var(--transition);
+  cursor: pointer;
+  min-width: 120px;
 }
-
+.assignment-field select option {
+  padding: 0.5rem;
+  color: #1a1a1a;
+  background: var(--white);
+}
+.assignment-field select option:checked {
+  background: var(--dark-green);
+  color: var(--white);
+}
 .assignment-field select:focus {
   outline: none;
   border-color: var(--dark-green);
+  box-shadow: 0 0 0 3px rgba(29, 76, 52, 0.1);
 }
 
 .order-footer {
@@ -1697,10 +1713,6 @@ body {
   background: var(--white);
 }
 
-.feedback-textarea:focus {
-  outline: none;
-  border-color: var(--dark-green);
-}
 
 .feedback-submit-btn {
   display: flex;
@@ -1742,4 +1754,133 @@ body {
   background: var(--olive);
   color: var(--white);
   transform: translateY(-1px);
+}
+
+.order-header select {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid rgba(116, 138, 118, 0.2);
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: var(--white);
+  color: var(--dark-green);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.order-header select:hover {
+  border-color: var(--dark-green);
+}
+
+.order-header select:focus {
+  outline: none;
+  border-color: var(--dark-green);
+  box-shadow: 0 0 0 3px rgba(29, 76, 52, 0.1);
+}
+
+.order-header select option {
+  padding: 0.5rem;
+  color: #1a1a1a;
+  background: var(--white);
+}
+
+.order-header select option:checked {
+  background: var(--dark-green);
+  color: var(--white);
+}
+
+/* ===== RATING SELECT ===== */
+.rating-select select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(116, 138, 118, 0.2);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  background: var(--white);
+  color: var(--dark-green);
+  font-weight: 500;
+  width: 100%;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.rating-select select:hover {
+  border-color: var(--dark-green);
+}
+
+.rating-select select:focus {
+  outline: none;
+  border-color: var(--dark-green);
+  box-shadow: 0 0 0 3px rgba(29, 76, 52, 0.1);
+}
+
+.rating-select select option {
+  padding: 0.5rem;
+  color: #1a1a1a;
+  background: var(--white);
+}
+
+.rating-select select option:checked {
+  background: var(--dark-green);
+  color: var(--white);
+}
+
+/* ===== CART ITEM TEXT VISIBILITY ===== */
+.cart-item-name {
+  display: block;
+  font-weight: 500;
+  color: var(--dark-green);
+}
+
+.cart-item-price {
+  font-size: 0.875rem;
+  color: var(--dark-green);
+  font-weight: 500;
+}
+
+/* ===== ORDER COMPLETE TEXT ===== */
+.order-complete p {
+  color: #2d2d2d;
+}
+
+.order-complete strong {
+  color: var(--dark-green);
+}
+
+/* ===== FEEDBACK SUCCESS/ERROR TEXT ===== */
+.feedback-success p,
+.feedback-error p {
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+.feedback-success {
+  background: rgba(159, 175, 145, 0.15);
+  border: 1px solid rgba(159, 175, 145, 0.2);
+}
+
+.feedback-error {
+  background: rgba(201, 138, 114, 0.1);
+  border: 1px solid rgba(201, 138, 114, 0.15);
+}
+
+.feedback-status {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--dark-green);
+  text-align: center;
+  font-weight: 500;
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 480px) {
+  .assignment-field select {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.5rem;
+    min-width: 80px;
+  }
+  
+  .order-header select {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
 }
