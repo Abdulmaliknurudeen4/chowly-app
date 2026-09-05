@@ -19,9 +19,7 @@ app.get('/api/menu', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Chowly API running on port ${PORT}`);
-});
+
 
 // POST /api/orders: Create a new order and its items
 app.post('/api/orders', async (req, res) => {
@@ -313,4 +311,8 @@ app.get('/api/feedback', async (req, res) => {
     console.error('Error fetching feedback:', err.message);
     res.status(500).json({ error: 'Server error retrieving feedback list' });
   }
+});
+
+app.listen(PORT, () => {
+  console.log(`Chowly API running on port ${PORT}`);
 });
