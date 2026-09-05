@@ -1,4 +1,4 @@
-// components/WaiterView.tsx
+// components/WaiterView.tsx - Fixed with working status dropdown
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -73,7 +73,7 @@ const WaiterView = () => {
   const handleUpdateOrder = async (orderId: string, updates: Partial<Order>) => {
     try {
       await axios.put(`${import.meta.env.VITE_API_BASE_URL}/orders/${orderId}`, updates);
-      fetchData();
+      fetchData(); // Refresh the data to show the changes
     } catch (err) {
       alert("Failed to update order. Please try again.");
     }
@@ -175,11 +175,26 @@ const WaiterView = () => {
                     <span className="order-id-label">Order</span>
                     <span className="order-id-value">#{order.id.split('-')[0]}</span>
                   </div>
-                  <div className="order-status">
-                    <span className={`status-badge ${getStatusColor(order.status)}`}>
-                      {getStatusIcon(order.status)}
-                      {order.status}
-                    </span>
+                  <div className="order-status-controls">
+                    <div className="order-status">
+                      <span className={`status-badge ${getStatusColor(order.status)}`}>
+                        {getStatusIcon(order.status)}
+                        {order.status}
+                      </span>
+                    </div>
+                    <div className="order-status-select">
+                      <label className="status-select-label">Update Status:</label>
+                      <select 
+                        value={order.status} 
+                        onChange={(e) => handleUpdateOrder(order.id, { status: e.target.value as Order['status'] })}
+                        className="status-select"
+                      >
+                        <option value="PENDING">PENDING</option>
+                        <option value="ASSIGNED">ASSIGNED</option>
+                        <option value="SERVED">SERVED</option>
+                        <option value="PAID">PAID</option>
+                      </select>
+                    </div>
                     <span className="order-time">
                       <Clock className="w-3 h-3" />
                       {order.estimated_wait_time} min
@@ -213,7 +228,7 @@ const WaiterView = () => {
                         </label>
                         <select 
                           value={order.waiter_id || ''} 
-                          onChange={(e) => handleUpdateOrder(order.id, { waiter_id: e.target.value })}
+                          onChange={(e) => handleUpdateOrder(order.id, { waiter_id: e.target.value || null })}
                         >
                           <option value="">-- Unassigned --</option>
                           {staff.filter(s => s.role === 'WAITER').map(s => (
@@ -229,7 +244,7 @@ const WaiterView = () => {
                         </label>
                         <select 
                           value={order.chef_id || ''} 
-                          onChange={(e) => handleUpdateOrder(order.id, { chef_id: e.target.value })}
+                          onChange={(e) => handleUpdateOrder(order.id, { chef_id: e.target.value || null })}
                         >
                           <option value="">-- Unassigned --</option>
                           {staff.filter(s => s.role === 'CHEF').map(s => (
@@ -245,7 +260,7 @@ const WaiterView = () => {
                         </label>
                         <select 
                           value={order.bartender_id || ''} 
-                          onChange={(e) => handleUpdateOrder(order.id, { bartender_id: e.target.value })}
+                          onChange={(e) => handleUpdateOrder(order.id, { bartender_id: e.target.value || null })}
                         >
                           <option value="">-- Unassigned --</option>
                           {staff.filter(s => s.role === 'BARTENDER').map(s => (

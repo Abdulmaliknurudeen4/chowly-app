@@ -1884,3 +1884,138 @@ body {
     padding: 0.25rem 0.5rem;
   }
 }
+
+/* Add to App.css - Status dropdown styles */
+
+.order-status-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.order-status-select {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-select-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--olive);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-select {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid rgba(116, 138, 118, 0.25);
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: var(--white);
+  color: var(--dark-green);
+  cursor: pointer;
+  transition: all var(--transition);
+  min-width: 120px;
+}
+
+.status-select:hover {
+  border-color: var(--dark-green);
+  box-shadow: var(--shadow-sm);
+}
+
+.status-select:focus {
+  outline: none;
+  border-color: var(--dark-green);
+  box-shadow: 0 0 0 3px rgba(29, 76, 52, 0.1);
+}
+
+.status-select option {
+  padding: 0.5rem;
+  color: #1a1a1a;
+  background: var(--white);
+  font-weight: 500;
+}
+
+.status-select option:checked {
+  background: var(--dark-green);
+  color: var(--white);
+}
+
+/* Status badge remains */
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-badge.status-pending {
+  background: rgba(201, 138, 114, 0.15);
+  color: var(--terracotta);
+}
+
+.status-badge.status-assigned {
+  background: rgba(29, 76, 52, 0.1);
+  color: var(--dark-green);
+}
+
+.status-badge.status-served {
+  background: rgba(159, 175, 145, 0.2);
+  color: var(--sage);
+}
+
+.status-badge.status-paid {
+  background: rgba(116, 138, 118, 0.1);
+  color: var(--olive);
+}
+
+.order-time {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--olive);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .order-status-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  
+  .order-status-select {
+    width: 100%;
+  }
+  
+  .status-select {
+    width: 100%;
+    min-width: unset;
+  }
+  
+  .order-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .status-select {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .status-select-label {
+    font-size: 0.6875rem;
+  }
+}
