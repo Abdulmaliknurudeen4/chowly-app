@@ -1512,3 +1512,234 @@ body {
 .stagger-enter > *:nth-child(8) { animation-delay: 0.40s; }
 .stagger-enter > *:nth-child(9) { animation-delay: 0.45s; }
 .stagger-enter > *:nth-child(10) { animation-delay: 0.50s; }
+
+/* Add to App.css - Additional styles for payment flow */
+
+.cart-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.order-complete {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  gap: 0.75rem;
+  overflow-y: auto;
+}
+
+.order-complete h3 {
+  font-size: 1.25rem;
+  color: var(--dark-green);
+  margin-top: 0.5rem;
+}
+
+.order-complete h4 {
+  font-size: 1.125rem;
+  color: var(--dark-green);
+  font-weight: 600;
+}
+
+.payment-section {
+  width: 100%;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pay-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.875rem;
+  border: none;
+  background: var(--dark-green);
+  color: var(--white);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all var(--transition);
+}
+
+.pay-btn:hover:not(:disabled) {
+  background: #163d2a;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.pay-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.payment-status {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.payment-status.success {
+  color: var(--sage);
+  background: rgba(159, 175, 145, 0.1);
+}
+
+.payment-status.error {
+  color: var(--terracotta);
+  background: rgba(201, 138, 114, 0.1);
+}
+
+.feedback-section {
+  width: 100%;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.feedback-title {
+  font-weight: 500;
+  color: var(--dark-green);
+  font-size: 1rem;
+}
+
+.feedback-success {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(159, 175, 145, 0.1);
+  border-radius: var(--radius-sm);
+  color: var(--sage);
+}
+
+.feedback-success p {
+  margin: 0;
+  font-weight: 500;
+}
+
+.feedback-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(201, 138, 114, 0.1);
+  border-radius: var(--radius-sm);
+  color: var(--terracotta);
+}
+
+.feedback-error p {
+  margin: 0;
+  font-weight: 500;
+}
+
+.feedback-status {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--olive);
+  text-align: center;
+}
+
+.rating-select {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: left;
+  width: 100%;
+}
+
+.rating-select label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--olive);
+}
+
+.rating-select select {
+  padding: 0.5rem;
+  border: 1px solid rgba(116, 138, 118, 0.2);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  background: var(--white);
+  width: 100%;
+  cursor: pointer;
+}
+
+.rating-select select:focus {
+  outline: none;
+  border-color: var(--dark-green);
+}
+
+.feedback-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid rgba(116, 138, 118, 0.2);
+  border-radius: var(--radius-sm);
+  min-height: 80px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  resize: vertical;
+  transition: border-color var(--transition);
+  background: var(--white);
+}
+
+.feedback-textarea:focus {
+  outline: none;
+  border-color: var(--dark-green);
+}
+
+.feedback-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.25rem;
+  border: none;
+  background: var(--terracotta);
+  color: var(--white);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all var(--transition);
+}
+
+.feedback-submit-btn:hover {
+  background: #b87a64;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.new-order-btn {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  border: 1px solid var(--olive);
+  background: transparent;
+  color: var(--olive);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all var(--transition);
+}
+
+.new-order-btn:hover {
+  background: var(--olive);
+  color: var(--white);
+  transform: translateY(-1px);
+}

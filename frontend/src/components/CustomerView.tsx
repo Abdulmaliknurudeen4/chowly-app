@@ -1,4 +1,4 @@
-// components/CustomerView.tsx
+// components/CustomerView.tsx - Complete fix with working payment flow
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -107,7 +107,7 @@ const CustomerView = () => {
       setCurrentOrder(response.data.order);
       setOrderStatus("Order placed successfully!");
       setCart([]);
-      setIsCartOpen(false);
+      // Keep cart open to show order details
       setTimeout(() => setOrderStatus(null), 3000);
     } catch (err) {
       setOrderStatus("Failed to place order. Please try again.");
@@ -123,7 +123,7 @@ const CustomerView = () => {
         amount: currentOrder.total_amount
       });
       setCurrentOrder({ ...currentOrder, status: response.data.order.status });
-      setPaymentStatus("Payment Successful!");
+      setPaymentStatus("Payment Successful! 🎉");
     } catch (err) {
       setPaymentStatus("Payment failed. Please try again.");
     }
@@ -137,7 +137,7 @@ const CustomerView = () => {
         rating,
         complaint_text: complaintText
       });
-      setFeedbackStatus("Thank you! Your feedback has been recorded.");
+      setFeedbackStatus("Thank you! Your feedback has been recorded. ❤️");
     } catch (err) {
       setFeedbackStatus("Failed to submit feedback. Please try again.");
     }
@@ -149,6 +149,7 @@ const CustomerView = () => {
     setFeedbackStatus(null);
     setRating(5);
     setComplaintText('');
+    setIsCartOpen(false);
   };
 
   const totalCartItems = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -192,6 +193,7 @@ const CustomerView = () => {
       <div className="menu-grid">
         {menuItems.map((item, index) => {
           const isInCart = cart.some(c => c.id === item.id);
+          const isDisabled = currentOrder !== null && currentOrder.status !== 'PAID';
           return (
             <motion.div
               key={item.id}
@@ -216,7 +218,7 @@ const CustomerView = () => {
                   </span>
                   <button
                     onClick={() => handleAddToCart(item)}
-                    disabled={currentOrder !== null && currentOrder.status !== 'PAID'}
+                    disabled={isDisabled}
                     className={`add-btn ${isInCart ? 'in-cart' : ''}`}
                   >
                     {isInCart ? '✓ Added' : 'Add to Cart'}
@@ -253,123 +255,142 @@ const CustomerView = () => {
                 </button>
               </div>
 
-              {currentOrder ? (
-                <div className="order-complete">
-                  <CheckCircle className="w-16 h-16 text-sage" />
-                  <h3>Order Complete!</h3>
-                  <p>Order ID: <strong>{currentOrder.id.split('-')[0]}</strong></p>
-                  <h4>Total Due: ₦{Number(currentOrder.total_amount).toLocaleString('en-NG')}</h4>
-                  
-                  {currentOrder.status === 'PAID' ? (
-                    <div className="feedback-section">
-                      <p className="feedback-title">How was your experience?</p>
-                      {feedbackStatus?.includes('Thank you') ? (
-                        <div className="feedback-success">
-                          <CheckCircle className="w-8 h-8" />
-                          <p>{feedbackStatus}</p>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="rating-select">
-                            <label>Rating</label>
-                            <select 
-                              value={rating} 
-                              onChange={(e) => setRating(Number(e.target.value))}
-                            >
-                              <option value={5}>⭐⭐⭐⭐⭐ (5/5)</option>
-                              <option value={4}>⭐⭐⭐⭐ (4/5)</option>
-                              <option value={3}>⭐⭐⭐ (3/5)</option>
-                              <option value={2}>⭐⭐ (2/5)</option>
-                              <option value={1}>⭐ (1/5)</option>
-                            </select>
+              <div className="cart-content">
+                {currentOrder ? (
+                  /* Order Complete View */
+                  <div className="order-complete">
+                    <CheckCircle className="w-16 h-16 text-sage" />
+                    <h3>Order Complete! 🍽️</h3>
+                    <p>Order ID: <strong>{currentOrder.id.split('-')[0]}</strong></p>
+                    <h4>Total Due: ₦{Number(currentOrder.total_amount).toLocaleString('en-NG')}</h4>
+                    
+                    {currentOrder.status === 'PAID' ? (
+                      /* Paid View - Show Feedback */
+                      <div className="feedback-section">
+                        <p className="feedback-title">How was your experience?</p>
+                        {feedbackStatus && feedbackStatus.includes('Thank you') ? (
+                          <div className="feedback-success">
+                            <CheckCircle className="w-8 h-8" />
+                            <p>{feedbackStatus}</p>
                           </div>
-                          <textarea
-                            placeholder="Any complaints or compliments? (Optional)"
-                            value={complaintText}
-                            onChange={(e) => setComplaintText(e.target.value)}
-                            className="feedback-textarea"
-                          />
-                          <button onClick={handleFeedbackSubmit} className="feedback-submit-btn">
-                            <Send className="w-4 h-4" />
-                            Submit Feedback
-                          </button>
-                          {feedbackStatus && <p className="feedback-error">{feedbackStatus}</p>}
-                        </>
-                      )}
-                      <button onClick={handleStartNewOrder} className="new-order-btn">
-                        Start New Order
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="payment-section">
-                      <button onClick={handlePayment} className="pay-btn">
-                        <CreditCard className="w-4 h-4" />
-                        {paymentStatus === "Processing..." ? "Processing..." : "Pay Now (Simulation)"}
-                      </button>
-                      {paymentStatus && <p className="payment-status">{paymentStatus}</p>}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <>
-                  {cart.length === 0 ? (
-                    <div className="empty-cart">
-                      <ShoppingCart className="w-16 h-16 text-olive" />
-                      <p>Your cart is empty</p>
-                      <span>Add some delicious items from our menu</span>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="cart-items">
-                        {cart.map((item) => (
-                          <motion.div
-                            key={item.id}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="cart-item"
-                          >
-                            <div className="cart-item-info">
-                              <span className="cart-item-name">{item.name}</span>
-                              <span className="cart-item-price">
-                                ₦{(Number(item.price) * item.quantity).toLocaleString('en-NG')}
-                              </span>
+                        ) : feedbackStatus && feedbackStatus.includes('Failed') ? (
+                          <div className="feedback-error">
+                            <AlertCircle className="w-8 h-8" />
+                            <p>{feedbackStatus}</p>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="rating-select">
+                              <label>Rating</label>
+                              <select 
+                                value={rating} 
+                                onChange={(e) => setRating(Number(e.target.value))}
+                              >
+                                <option value={5}>⭐⭐⭐⭐⭐ (5/5)</option>
+                                <option value={4}>⭐⭐⭐⭐ (4/5)</option>
+                                <option value={3}>⭐⭐⭐ (3/5)</option>
+                                <option value={2}>⭐⭐ (2/5)</option>
+                                <option value={1}>⭐ (1/5)</option>
+                              </select>
                             </div>
-                            <div className="cart-item-controls">
-                              <button onClick={() => handleRemoveFromCart(item.id)}>
-                                <Minus className="w-4 h-4" />
-                              </button>
-                              <span className="cart-item-qty">{item.quantity}</span>
-                              <button onClick={() => handleAddToCart(item)}>
-                                <Plus className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </motion.div>
-                        ))}
+                            <textarea
+                              placeholder="Any complaints or compliments? (Optional)"
+                              value={complaintText}
+                              onChange={(e) => setComplaintText(e.target.value)}
+                              className="feedback-textarea"
+                            />
+                            <button onClick={handleFeedbackSubmit} className="feedback-submit-btn">
+                              <Send className="w-4 h-4" />
+                              Submit Feedback
+                            </button>
+                            {feedbackStatus && <p className="feedback-status">{feedbackStatus}</p>}
+                          </>
+                        )}
+                        <button onClick={handleStartNewOrder} className="new-order-btn">
+                          Start New Order
+                        </button>
                       </div>
-                      <div className="cart-footer">
-                        <div className="cart-total">
-                          <span>Total</span>
-                          <span>₦{cartTotal.toLocaleString('en-NG')}</span>
-                        </div>
-                        <div className="cart-actions">
-                          <button onClick={handleClearCart} className="clear-cart-btn">
-                            <Trash2 className="w-4 h-4" />
-                            Clear
-                          </button>
-                          <button onClick={handleCheckout} className="checkout-btn">
-                            Checkout Now
-                          </button>
-                        </div>
-                        {orderStatus && (
-                          <p className={`order-status ${orderStatus.includes('Failed') ? 'error' : 'success'}`}>
-                            {orderStatus}
+                    ) : (
+                      /* Unpaid View - Show Payment Button */
+                      <div className="payment-section">
+                        <button 
+                          onClick={handlePayment} 
+                          className="pay-btn"
+                          disabled={paymentStatus === "Processing..."}
+                        >
+                          <CreditCard className="w-4 h-4" />
+                          {paymentStatus === "Processing..." ? "Processing..." : "Pay Now (Simulation)"}
+                        </button>
+                        {paymentStatus && (
+                          <p className={`payment-status ${paymentStatus.includes('Successful') ? 'success' : paymentStatus.includes('failed') ? 'error' : ''}`}>
+                            {paymentStatus}
                           </p>
                         )}
                       </div>
-                    </>
-                  )}
-                </>
-              )}
+                    )}
+                  </div>
+                ) : (
+                  /* Cart View */
+                  <>
+                    {cart.length === 0 ? (
+                      <div className="empty-cart">
+                        <ShoppingCart className="w-16 h-16 text-olive" />
+                        <p>Your cart is empty</p>
+                        <span>Add some delicious items from our menu</span>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="cart-items">
+                          {cart.map((item) => (
+                            <motion.div
+                              key={item.id}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              className="cart-item"
+                            >
+                              <div className="cart-item-info">
+                                <span className="cart-item-name">{item.name}</span>
+                                <span className="cart-item-price">
+                                  ₦{(Number(item.price) * item.quantity).toLocaleString('en-NG')}
+                                </span>
+                              </div>
+                              <div className="cart-item-controls">
+                                <button onClick={() => handleRemoveFromCart(item.id)}>
+                                  <Minus className="w-4 h-4" />
+                                </button>
+                                <span className="cart-item-qty">{item.quantity}</span>
+                                <button onClick={() => handleAddToCart(item)}>
+                                  <Plus className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                        <div className="cart-footer">
+                          <div className="cart-total">
+                            <span>Total</span>
+                            <span>₦{cartTotal.toLocaleString('en-NG')}</span>
+                          </div>
+                          <div className="cart-actions">
+                            <button onClick={handleClearCart} className="clear-cart-btn">
+                              <Trash2 className="w-4 h-4" />
+                              Clear
+                            </button>
+                            <button onClick={handleCheckout} className="checkout-btn">
+                              Checkout Now
+                            </button>
+                          </div>
+                          {orderStatus && (
+                            <p className={`order-status ${orderStatus.includes('Failed') ? 'error' : 'success'}`}>
+                              {orderStatus}
+                            </p>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
             </motion.div>
           </>
         )}
