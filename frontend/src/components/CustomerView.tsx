@@ -1,4 +1,5 @@
-// components/CustomerView.tsx - Complete fix with working payment flow
+// components/CustomerView.tsx - Updated with estimated wait time display
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -33,6 +34,7 @@ export interface PlacedOrder {
   id: string;
   total_amount: string;
   status: string;
+  estimated_wait_time?: number; // Add this field
 }
 
 const CustomerView = () => {
@@ -91,6 +93,11 @@ const CustomerView = () => {
   };
 
   const cartTotal = cart.reduce((total, item) => total + (Number(item.price) * item.quantity), 0);
+  
+  // Calculate estimated wait time based on the longest prep time in cart
+  const estimatedWaitTime = cart.length > 0 
+    ? Math.max(...cart.map(item => item.prep_time_minutes), 15) 
+    : 0;
 
   const handleCheckout = async () => {
     if (cart.length === 0) return;
@@ -107,7 +114,6 @@ const CustomerView = () => {
       setCurrentOrder(response.data.order);
       setOrderStatus("Order placed successfully!");
       setCart([]);
-      // Keep cart open to show order details
       setTimeout(() => setOrderStatus(null), 3000);
     } catch (err) {
       setOrderStatus("Failed to place order. Please try again.");
@@ -264,6 +270,14 @@ const CustomerView = () => {
                     <p>Order ID: <strong>{currentOrder.id.split('-')[0]}</strong></p>
                     <h4>Total Due: ₦{Number(currentOrder.total_amount).toLocaleString('en-NG')}</h4>
                     
+                    {/* Show estimated wait time for the order */}
+                    {currentOrder.estimated_wait_time && (
+                      <div className="estimated-wait-time">
+                        <Clock className="w-4 h-4" />
+                        <span>Estimated wait time: <strong>{currentOrder.estimated_wait_time} minutes</strong></span>
+                      </div>
+                    )}
+                    
                     {currentOrder.status === 'PAID' ? (
                       /* Paid View - Show Feedback */
                       <div className="feedback-section">
@@ -367,6 +381,12 @@ const CustomerView = () => {
                           ))}
                         </div>
                         <div className="cart-footer">
+                          {/* Estimated Wait Time - NEW */}
+                          <div className="estimated-wait-time">
+                            <Clock className="w-4 h-4" />
+                            <span>Estimated wait time: <strong>{estimatedWaitTime} minutes</strong></span>
+                          </div>
+                          
                           <div className="cart-total">
                             <span>Total</span>
                             <span>₦{cartTotal.toLocaleString('en-NG')}</span>

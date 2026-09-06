@@ -2019,3 +2019,36 @@ body {
     font-size: 0.6875rem;
   }
 }
+
+/* Add these styles for the estimated wait time */
+.estimated-wait-time {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0;
+  color: #4a6b5d;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #e8f0ed;
+}
+
+.estimated-wait-time svg {
+  flex-shrink: 0;
+}
+
+.estimated-wait-time strong {
+  color: #2c4a3e;
+}
+
+/* Update cart-footer spacing */
+.cart-footer {
+  padding-top: 1rem;
+}
+
+/* Style for the order complete estimated wait time */
+.order-complete .estimated-wait-time {
+  background: #f0f7f4;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin: 0.5rem 0 1rem 0;
+  justify-content: center;
+}
